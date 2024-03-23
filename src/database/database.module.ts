@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import typeorm from 'src/config/typeorm';
+import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
@@ -10,22 +11,17 @@ import typeorm from 'src/config/typeorm';
       load: [typeorm],
     }),
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) =>
-        configService.get('typeorm'),
+      imports: [ConfigModule.forFeature(databaseConfig)],
+      inject: [databaseConfig.KEY],
+      useFactory: (
+        databaseConfiguration: ConfigType<typeof databaseConfig>,
+      ) => ({
+        type: 'postgres',
+        url: databaseConfiguration.url,
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
     }),
-
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: 'localhost',
-    //   port: 5432,
-    //   username: 'root',
-    //   password: 'root',
-    //   database: 'shopnest',
-    //   autoLoadEntities: true,
-    //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    //   synchronize: true,
-    // }),
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsPositive } from 'class-validator';
+import { IsInt, IsOptional } from 'class-validator';
 import { IsCardinal } from '../decorators/is-cardinal.decorator';
 
 export class PaginationDto {

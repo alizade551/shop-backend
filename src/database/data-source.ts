@@ -2,11 +2,7 @@ import { DataSource } from 'typeorm';
 
 export default new DataSource({
   type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'root',
-  password: 'root',
-  database: 'shopnest',
+  url: process.env.DATABASE_URL,
   entities: ['dist/domain/**/*.entity.js'],
   migrations: ['dist/databse/migrations/*.js'],
 });
