@@ -13,6 +13,7 @@ import {
 import { User } from 'src/users/entities/user.entity';
 import { Payment } from 'src/domain/payments/entities/payment.entity';
 import { OrderItem } from './order-item.entity';
+import { Expose } from 'class-transformer';
 
 @Entity()
 export class Order {
@@ -40,4 +41,11 @@ export class Order {
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
   items: OrderItem[];
+
+  @Expose()
+  get total() {
+    return this.items?.reduce((total, item) => {
+      return total + item.subTotal;
+    }, 0);
+  }
 }

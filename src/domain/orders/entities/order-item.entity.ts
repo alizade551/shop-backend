@@ -21,4 +21,8 @@ export class OrderItem {
 
   @ManyToOne(() => Product, (product) => product.items)
   product: Product;
+
+  get subTotal() {
+    return this.quantity * this.price;
+  }
 }
