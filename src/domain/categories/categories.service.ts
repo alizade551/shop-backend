@@ -20,7 +20,6 @@ export class CategoriesService {
   ) {}
 
   async exist(name: string) {
-    console.log(name);
     const category = await this.categoryRepository.findOne({
       where: [
         {
