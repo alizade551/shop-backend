@@ -1,4 +1,4 @@
-import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 
 export class RegistryDates {
   @UpdateDateColumn()
@@ -6,4 +6,7 @@ export class RegistryDates {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

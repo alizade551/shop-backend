@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from 'src/domain/products/entities/product.entity';
+import { Expose } from 'class-transformer';
 
 @Entity()
 export class OrderItem {
@@ -22,6 +29,10 @@ export class OrderItem {
   @ManyToOne(() => Product, (product) => product.items)
   product: Product;
 
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @Expose()
   get subTotal() {
     return this.quantity * this.price;
   }

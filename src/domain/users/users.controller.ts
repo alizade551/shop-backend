@@ -16,6 +16,7 @@ import { IdDto } from 'src/common/dto/id.dto';
 import { User } from './entities/user.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UsersService } from './users.services';
+import { RemoveDto } from 'src/common/dto/remove.dto';
 
 @Controller('users')
 export class UsersController {
@@ -44,7 +45,12 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param() { id }: IdDto) {
-    return this.usersService.remove(id);
+  remove(@Param() { id }: IdDto, @Query() { soft }: RemoveDto) {
+    return this.usersService.remove(id, soft);
+  }
+
+  @Patch(':id/recover')
+  revover(@Param() { id }: IdDto) {
+    return this.usersService.recover(id);
   }
 }

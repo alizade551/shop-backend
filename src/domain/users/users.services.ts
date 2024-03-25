@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -56,7 +57,15 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        orders: {
+          items: true,
+          payment: true,
+        },
+      },
+    });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -68,10 +77,33 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async remove(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+  async remove(id: number, soft: boolean) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: { orders: true },
+    });
     if (!user) throw new NotFoundException('User not found');
 
-    return this.userRepository.remove(user);
+    return soft
+      ? this.userRepository.softRemove(user)
+      : this.userRepository.remove(user);
+  }
+
+  async recover(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        orders: {
+          items: true,
+          payment: true,
+        },
+      },
+      withDeleted: true,
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+    if (!user.isDeleted) throw new ConflictException('User not deleted');
+
+    return await this.userRepository.recover(user);
   }
 }
