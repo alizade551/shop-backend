@@ -10,7 +10,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/domain/users/entities/user.entity';
 import { Payment } from 'src/domain/payments/entities/payment.entity';
 import { OrderItem } from './order-item.entity';
 import { Expose } from 'class-transformer';

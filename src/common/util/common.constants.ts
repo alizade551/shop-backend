@@ -5,6 +5,7 @@ export const VALIDATION_PIPE_OPTIONS: ValidationPipeOptions = {
   forbidNonWhitelisted: true,
   transform: true,
   transformOptions: {
+    // "1"=>1 & "true"=>true "false"=>false string to normal
     enableImplicitConversion: true,
   },
 };
