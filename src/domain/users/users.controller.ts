@@ -17,6 +17,8 @@ import { User } from './entities/user.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UsersService } from './users.services';
 import { RemoveDto } from 'src/common/dto/remove.dto';
+import { LoginDto } from 'src/auth/dto/login.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -49,8 +51,9 @@ export class UsersController {
     return this.usersService.remove(id, soft);
   }
 
-  @Patch(':id/recover')
-  revover(@Param() { id }: IdDto) {
-    return this.usersService.recover(id);
+  @Public()
+  @Patch('recover')
+  recover(@Body() loginDto: LoginDto) {
+    return this.usersService.recover(loginDto);
   }
 }
