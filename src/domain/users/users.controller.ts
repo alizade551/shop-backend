@@ -19,6 +19,8 @@ import { UsersService } from './users.services';
 import { RemoveDto } from 'src/common/dto/remove.dto';
 import { LoginDto } from 'src/auth/dto/login.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { RequestUser } from 'src/auth/interfaces/request-user.interface';
+import { User as CurrentUser } from 'src/auth/decorators/user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -42,18 +44,26 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param() { id }: IdDto, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(
+    @Param() { id }: IdDto,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.usersService.update(id, updateUserDto, user);
   }
 
   @Delete(':id')
-  remove(@Param() { id }: IdDto, @Query() { soft }: RemoveDto) {
-    return this.usersService.remove(id, soft);
+  remove(
+    @Param() { id }: IdDto,
+    @Query() { soft }: RemoveDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.usersService.remove(id, soft, user);
   }
 
   @Public()
   @Patch('recover')
-  recover(@Body() loginDto: LoginDto) {
-    return this.usersService.recover(loginDto);
+  recover(@Body() loginDto: LoginDto, @CurrentUser() user: RequestUser) {
+    return this.usersService.recover(loginDto, user);
   }
 }

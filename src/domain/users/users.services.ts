@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -14,6 +15,9 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { DEFAULT_PAGE_SIZE } from 'src/common/util/common.constants';
 import { HashingService } from 'src/auth/hashing/hashing.service';
 import { LoginDto } from 'src/auth/dto/login.dto';
+import { RequestUser } from 'src/auth/interfaces/request-user.interface';
+import { Role } from 'src/auth/roles/enums/role.enum';
+import { compareUserId } from 'src/auth/util/authorization.util';
 
 @Injectable()
 export class UsersService {
@@ -74,21 +78,34 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const exist = await this.userRepository.findOne({ where: { id } });
-    if (!exist) {
-      throw new NotFoundException('User does not exist');
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    currentUser: RequestUser,
+  ) {
+    if (currentUser.role !== Role.ADMIN) {
+      compareUserId(currentUser.id, id);
     }
-
     const user = await this.userRepository.preload({
       id,
       ...updateUserDto,
     });
 
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
     return await this.userRepository.save(user);
   }
 
-  async remove(id: number, soft: boolean) {
+  async remove(id: number, soft: boolean, currentUser: RequestUser) {
+    if (currentUser.role !== Role.ADMIN) {
+      compareUserId(currentUser.id, id);
+
+      if (!soft) {
+        throw new ForbiddenException('Foribbden resurce');
+      }
+    }
     const user = await this.userRepository.findOne({
       where: { id },
       relations: { orders: true },
@@ -99,7 +116,7 @@ export class UsersService {
       ? this.userRepository.softRemove(user)
       : this.userRepository.remove(user);
   }
-  async recover(loginDto: LoginDto) {
+  async recover(loginDto: LoginDto, currentUser: RequestUser) {
     const { email, password } = loginDto;
 
     const user = await this.userRepository.findOne({
@@ -114,6 +131,10 @@ export class UsersService {
     });
     if (!user) {
       throw new UnauthorizedException('Invalid email');
+    }
+
+    if (currentUser.role !== Role.ADMIN) {
+      compareUserId(currentUser.id, user.id);
     }
 
     const isMatch = await this.hashingService.compare(password, user.password);

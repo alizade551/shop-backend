@@ -1,13 +1,15 @@
 import { Controller, Param, Post } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { IdDto } from 'src/common/dto/id.dto';
+import { User } from 'src/auth/decorators/user.decorator';
+import { RequestUser } from 'src/auth/interfaces/request-user.interface';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post('/:id')
-  payOrder(@Param() { id }: IdDto) {
-    return this.paymentsService.payOrder(id);
+  payOrder(@Param() { id }: IdDto, @User() user: RequestUser) {
+    return this.paymentsService.payOrder(id, user);
   }
 }
