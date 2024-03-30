@@ -39,14 +39,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const requestUser: RequestUser = { id: user.id };
+    const requestUser: RequestUser = this.createRequestUser(user);
     return requestUser;
   }
 
   async validateJwt(payload: JwtPayload) {
     const user = await this.userRepository.findOneBy({ id: payload.sub });
     if (!user) throw new UnauthorizedException('Invalid token');
-    const requestUser: RequestUser = { id: payload.sub };
+    const requestUser: RequestUser = this.createRequestUser(user);
     return requestUser;
   }
 
@@ -71,5 +71,11 @@ export class AuthService {
     }
 
     return await this.userRepository.save(user);
+  }
+
+  private createRequestUser(user: User) {
+    const { id, role } = user;
+    const requestUser: RequestUser = { id, role };
+    return requestUser;
   }
 }
