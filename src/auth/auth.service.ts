@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/domain/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +10,7 @@ import { HashingService } from './hashing/hashing.service';
 import { RequestUser } from './interfaces/request-user.interface';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { Role } from './roles/enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -53,5 +58,18 @@ export class AuthService {
   async getProfile(id: number) {
     const user = await this.userRepository.findOneBy({ id });
     return user;
+  }
+
+  async assignRole(id: number, role: Role) {
+    const user = await this.userRepository.preload({
+      id,
+      role,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
+    return await this.userRepository.save(user);
   }
 }
