@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer';
+import { Role } from 'src/auth/roles/enums/role.enum';
 import { RegistryDates } from 'src/common/embedded/registry-dates.embedded';
 import { Order } from 'src/domain/orders/entities/order.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -20,6 +21,14 @@ export class User {
   @Exclude()
   @Column()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    enumName: 'role_enum',
+    default: Role.USER,
+  })
+  role: Role;
 
   @Column(() => RegistryDates, { prefix: false })
   registryDates: RegistryDates;
