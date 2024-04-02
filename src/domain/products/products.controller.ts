@@ -19,6 +19,8 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { createFileValidators } from 'src/files/util/file-validation.util';
 import { MaxFileCount } from 'src/files/util/file.constants';
+import { IdDto } from 'src/common/dto/id.dto';
+import { IdFilenameDto } from 'src/files/dto/id-filename.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -52,13 +54,24 @@ export class ProductsController {
   @Post(':id/image')
   @UseInterceptors(FilesInterceptor('file', MaxFileCount.PRODUCT_IMAGES))
   uploadImage(
+    @Param() { id }: IdDto,
     @UploadedFiles(
       new ParseFilePipe({
         validators: createFileValidators('2MB', 'png', 'jpeg'),
       }),
     )
-    file: Express.Multer.File,
+    files: Express.Multer.File,
   ) {
-    return file;
+    return this.productsService.uploadImages(id, files);
+  }
+
+  @Get(':id/images/:filename')
+  downloadImage(@Param() { id, filename }: IdFilenameDto) {
+    return this.productsService.downloadImage(id, filename);
+  }
+
+  @Delete(':id/images/:filename')
+  deleteImage(@Param() { id, filename }: IdFilenameDto) {
+    return this.productsService.deleteImage(id, filename);
   }
 }

@@ -11,13 +11,24 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IdFilenameDto } from 'src/files/dto/id-filename.dto';
 
 @Injectable()
 export class ProductsService {
+  deleteImage(id: any, filename: any) {
+    throw new Error('Method not implemented.');
+  }
+  downloadImage(id: any, filename: any) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
   ) {}
+
+  uploadImages(id: number, files: any) {
+    throw new Error('Method not implemented.');
+  }
 
   async exists(name: string) {
     const product = await this.productRepository.findOne({
