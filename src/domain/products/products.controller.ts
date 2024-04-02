@@ -53,14 +53,14 @@ export class ProductsController {
 
   @Post(':id/image')
   @UseInterceptors(FilesInterceptor('file', MaxFileCount.PRODUCT_IMAGES))
-  uploadImage(
+  uploadImages(
     @Param() { id }: IdDto,
     @UploadedFiles(
       new ParseFilePipe({
         validators: createFileValidators('2MB', 'png', 'jpeg'),
       }),
     )
-    files: Express.Multer.File,
+    files: Express.Multer.File[],
   ) {
     return this.productsService.uploadImages(id, files);
   }
