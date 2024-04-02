@@ -20,11 +20,16 @@ import { IdDto } from 'src/common/dto/id.dto';
 import { RolesDto } from './dto/roles.dto';
 import { Roles } from './decorators/roles.decorators';
 import { Role } from './roles/enums/role.enum';
+import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
+import { JwtCookieHeader } from './swagger/jwt-cookie.header';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiBody({ type: LoginDto })
+  @ApiOkResponse({ headers: JwtCookieHeader })
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')

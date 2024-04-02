@@ -7,5 +7,5 @@ export class PaginationDto {
 
   @IsOptional()
   @IsInt()
-  readonly offset: number;
+  readonly offset?: number;
 }

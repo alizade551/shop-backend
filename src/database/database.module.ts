@@ -23,7 +23,6 @@ import { DatabaseExceptionFilter } from './exception-filters/database-exception/
       provide: APP_FILTER,
       useClass: NotFoundExceptionFilter,
     },
-
     {
       provide: APP_FILTER,
       useClass: DatabaseExceptionFilter,

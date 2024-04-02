@@ -4,5 +4,5 @@ import { IsBoolean } from '../decorators/validators/is.boolean.decorators';
 export class RemoveDto {
   @IsOptional()
   @IsBoolean()
-  readonly soft: boolean;
+  readonly soft?: boolean;
 }

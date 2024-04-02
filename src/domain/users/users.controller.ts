@@ -21,7 +21,9 @@ import { LoginDto } from 'src/auth/dto/login.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { RequestUser } from 'src/auth/interfaces/request-user.interface';
 import { User as CurrentUser } from 'src/auth/decorators/user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
