@@ -6,6 +6,7 @@ import {
 import * as bytes from 'bytes';
 import { lookup } from 'mime-types';
 import { NonEmptyArray } from 'src/common/util/array.util';
+import { FileSignatureValidator } from '../validators/file-signature.validator';
 
 type FileType = 'png' | 'jpeg' | 'pdf';
 type FileSize = `${number}${'KB' | 'MB' | 'GB'}`;
@@ -24,5 +25,6 @@ export const createFileValidators = (
   return [
     new MaxFileSizeValidator({ maxSize: bytes(maxSize) }),
     new FileTypeValidator({ fileType: fileTypeRegex }),
+    new FileSignatureValidator(),
   ];
 };
