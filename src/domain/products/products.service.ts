@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DEFAULT_PAGE_SIZE } from 'src/common/util/common.constants';
@@ -11,7 +10,7 @@ import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IdFilenameDto } from 'src/files/dto/id-filename.dto';
+
 import {
   BASE_PATH,
   FilePath,
