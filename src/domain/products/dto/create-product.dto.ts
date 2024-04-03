@@ -8,7 +8,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   readonly name: string;
   @IsNotEmpty()
-  readonly description: string;
+  readonly description?: string;
 
   @IsNotEmpty()
   @IsCurrency()

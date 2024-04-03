@@ -20,10 +20,12 @@ import { IdDto } from 'src/common/dto/id.dto';
 import { RolesDto } from './dto/roles.dto';
 import { Roles } from './decorators/roles.decorators';
 import { Role } from './roles/enums/role.enum';
-import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { JwtCookieHeader } from './swagger/jwt-cookie.header';
+import { ProfileSchema } from './swagger/profile.schema';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -44,11 +46,13 @@ export class AuthController {
   }
 
   @Get('profile')
+  @ApiOkResponse({ type: ProfileSchema })
   getProfile(@User() { id }: RequestUser) {
     return this.authService.getProfile(id);
   }
 
   @Roles(Role.ADMIN)
+  @ApiOkResponse({ type: ProfileSchema })
   @Patch(':id/assign-role')
   assignRole(@Param() { id }: IdDto, @Body() { role }: RolesDto) {
     return this.authService.assignRole(id, role);

@@ -8,7 +8,6 @@ import {
   Delete,
   Query,
   UseInterceptors,
-  ParseFilePipe,
   UploadedFiles,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -17,14 +16,17 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { createParseFilePipe } from 'src/files/util/file-validation.util';
 import {
-  createFileValidators,
-  createParseFilePipe,
-} from 'src/files/util/file-validation.util';
-import { MaxFileCount } from 'src/files/util/file.constants';
+  MaxFileCount,
+  MULTIPART_FORMDATA_KEY,
+} from 'src/files/util/file.constants';
 import { IdDto } from 'src/common/dto/id.dto';
 import { IdFilenameDto } from 'src/files/dto/id-filename.dto';
+import { ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { FileSchema, FilesSchema } from 'src/files/swagger/schemas/file.schema';
 
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -55,7 +57,9 @@ export class ProductsController {
   }
 
   @Post(':id/image')
-  @UseInterceptors(FilesInterceptor('file', MaxFileCount.PRODUCT_IMAGES))
+  @ApiConsumes(MULTIPART_FORMDATA_KEY)
+  @ApiBody({ type: FilesSchema })
+  @UseInterceptors(FilesInterceptor('files', MaxFileCount.PRODUCT_IMAGES))
   uploadImages(
     @Param() { id }: IdDto,
     @UploadedFiles(createParseFilePipe('2MB', 'png', 'jpeg'))
@@ -64,6 +68,7 @@ export class ProductsController {
     return this.productsService.uploadImages(id, files);
   }
 
+  @ApiOkResponse({ type: FileSchema })
   @Get(':id/images/:filename')
   downloadImage(@Param() { id, filename }: IdFilenameDto) {
     return this.productsService.downloadImage(id, filename);

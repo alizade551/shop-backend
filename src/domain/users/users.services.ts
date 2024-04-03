@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -43,14 +42,6 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const exist = await this.existsUser(
-      createUserDto.email,
-      createUserDto.phone,
-    );
-    if (exist) {
-      throw new BadRequestException('Email or phone already exists');
-    }
-
     const user = this.userRepository.create(createUserDto);
 
     return await this.userRepository.save(user);

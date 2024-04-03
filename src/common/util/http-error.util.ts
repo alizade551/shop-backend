@@ -17,6 +17,7 @@ export const HttpError = {
     status: HttpStatus.UNSUPPORTED_MEDIA_TYPE,
     error: 'Unsupported Media Type',
   },
+
   BAD_REQUEST: {
     status: HttpStatus.BAD_REQUEST,
     error: 'Bad Request',

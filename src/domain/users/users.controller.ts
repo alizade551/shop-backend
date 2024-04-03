@@ -29,6 +29,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Public()
   async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<User | BadRequestException> {

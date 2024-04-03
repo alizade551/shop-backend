@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DEFAULT_PAGE_SIZE } from 'src/common/util/common.constants';
@@ -101,11 +97,6 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto) {
-    const exist = await this.exists(createProductDto.name);
-    if (exist) {
-      throw new BadRequestException('Email or phone already exists');
-    }
-
     const product = this.productRepository.create(createProductDto);
 
     return await this.productRepository.save(product);
