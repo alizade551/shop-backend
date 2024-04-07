@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DefaultPageSize } from 'src/querying/util/querying.constants';
 import { Product } from './entities/product.entity';
@@ -16,6 +16,7 @@ import { join } from 'path';
 import { pathExists } from 'fs-extra';
 import { StorageService } from 'src/files/storage/storage.service';
 import { PaginationService } from 'src/querying/pagination.service';
+import { ProductsQueryDto } from './dto/querying/products.filter.dto';
 
 @Injectable()
 export class ProductsService {
@@ -92,12 +93,18 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
-  async findAll(paginationDto: PaginationDto) {
-    const { page } = paginationDto;
-    const limit = paginationDto.limit ?? DefaultPageSize.PRODUCT;
+  async findAll(productsQueryDto: ProductsQueryDto) {
+    const { page, name, price, categoryId, sort, order } = productsQueryDto;
+    const limit = productsQueryDto.limit ?? DefaultPageSize.PRODUCT;
     const offset = this.paginationService.calculateOffset(limit, page);
 
     const [data, count] = await this.productRepository.findAndCount({
+      where: {
+        name: name ? ILike(`%${name}%`) : undefined,
+        price,
+        categories: { id: categoryId },
+      },
+      order: { [sort]: order },
       skip: offset,
       take: limit,
     });

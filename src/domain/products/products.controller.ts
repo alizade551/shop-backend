@@ -25,6 +25,7 @@ import { IdDto } from 'src/common/dto/id.dto';
 import { IdFilenameDto } from 'src/files/dto/id-filename.dto';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FileSchema, FilesSchema } from 'src/files/swagger/schemas/file.schema';
+import { ProductsQueryDto } from './dto/querying/products.filter.dto';
 
 @ApiTags('products')
 @Controller('products')
@@ -37,8 +38,8 @@ export class ProductsController {
   }
   @Public()
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
-    return this.productsService.findAll(paginationDto);
+  findAll(@Query() productsQueryDto: ProductsQueryDto) {
+    return this.productsService.findAll(productsQueryDto);
   }
   @Public()
   @Get(':id')
