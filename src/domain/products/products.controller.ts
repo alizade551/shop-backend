@@ -13,7 +13,7 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from 'src/querying/dto/pagination.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { createParseFilePipe } from 'src/files/util/file-validation.util';
@@ -68,6 +68,7 @@ export class ProductsController {
     return this.productsService.uploadImages(id, files);
   }
 
+  @Public()
   @ApiOkResponse({ type: FileSchema })
   @Get(':id/images/:filename')
   downloadImage(@Param() { id, filename }: IdFilenameDto) {

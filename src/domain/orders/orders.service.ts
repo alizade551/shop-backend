@@ -2,14 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DEFAULT_PAGE_SIZE } from 'src/common/util/common.constants';
+import { DefaultPageSize } from 'src/querying/util/querying.constants';
 import { Order } from './entities/order.entity';
 
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from 'src/querying/dto/pagination.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderItemDto } from './dto/order-item.dto';
 import { Product } from '../products/entities/product.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { PaginationService } from 'src/querying/pagination.service';
 
 @Injectable()
 export class OrdersService {
@@ -20,6 +21,7 @@ export class OrdersService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -38,11 +40,16 @@ export class OrdersService {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { limit, offset } = paginationDto;
-    return await this.orderRepository.find({
+    const { page } = paginationDto;
+    const limit = paginationDto.limit ?? DefaultPageSize.ORDER;
+    const offset = this.paginationService.calculateOffset(limit, page);
+    const [data, count] = await this.orderRepository.findAndCount({
       skip: offset,
-      take: limit ?? DEFAULT_PAGE_SIZE.USER,
+      take: limit,
     });
+
+    const meta = this.paginationService.createMeta(limit, page, count);
+    return { data, meta };
   }
 
   async findOne(id: number) {

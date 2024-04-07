@@ -10,13 +10,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { DEFAULT_PAGE_SIZE } from 'src/common/util/common.constants';
+import { PaginationDto } from 'src/querying/dto/pagination.dto';
+import { DefaultPageSize } from 'src/querying/util/querying.constants';
 import { HashingService } from 'src/auth/hashing/hashing.service';
 import { LoginDto } from 'src/auth/dto/login.dto';
 import { RequestUser } from 'src/auth/interfaces/request-user.interface';
 import { Role } from 'src/auth/roles/enums/role.enum';
 import { compareUserId } from 'src/auth/util/authorization.util';
+import { PaginationService } from 'src/querying/pagination.service';
 
 @Injectable()
 export class UsersService {
@@ -24,22 +25,8 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly hashingService: HashingService,
+    private readonly paginationService: PaginationService,
   ) {}
-
-  async existsUser(email: string, phone: string) {
-    const user = await this.userRepository.findOne({
-      where: [
-        {
-          email,
-        },
-        {
-          phone,
-        },
-      ],
-    });
-
-    return user;
-  }
 
   async create(createUserDto: CreateUserDto) {
     const user = this.userRepository.create(createUserDto);
@@ -48,11 +35,19 @@ export class UsersService {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { limit, offset } = paginationDto;
-    return await this.userRepository.find({
+    const { page } = paginationDto;
+
+    const limit = paginationDto.limit ?? DefaultPageSize.USER;
+    const offset = this.paginationService.calculateOffset(limit, page);
+
+    const [data, count] = await this.userRepository.findAndCount({
       skip: offset,
-      take: limit ?? DEFAULT_PAGE_SIZE.USER,
+      take: limit,
     });
+
+    const meta = this.paginationService.createMeta(limit, page, count);
+
+    return { data, meta };
   }
 
   async findOne(id: number) {

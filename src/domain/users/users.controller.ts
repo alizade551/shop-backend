@@ -14,7 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IdDto } from 'src/common/dto/id.dto';
 import { User } from './entities/user.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from 'src/querying/dto/pagination.dto';
 import { UsersService } from './users.services';
 import { RemoveDto } from 'src/common/dto/remove.dto';
 import { LoginDto } from 'src/auth/dto/login.dto';

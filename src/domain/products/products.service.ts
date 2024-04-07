@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DEFAULT_PAGE_SIZE } from 'src/common/util/common.constants';
+import { DefaultPageSize } from 'src/querying/util/querying.constants';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from 'src/querying/dto/pagination.dto';
 
 import {
   BASE_PATH,
@@ -15,6 +15,7 @@ import {
 import { join } from 'path';
 import { pathExists } from 'fs-extra';
 import { StorageService } from 'src/files/storage/storage.service';
+import { PaginationService } from 'src/querying/pagination.service';
 
 @Injectable()
 export class ProductsService {
@@ -22,6 +23,7 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly storageService: StorageService,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async uploadImages(id: number, files: Express.Multer.File[]) {
@@ -84,18 +86,6 @@ export class ProductsService {
     });
   }
 
-  async exists(name: string) {
-    const product = await this.productRepository.findOne({
-      where: [
-        {
-          name,
-        },
-      ],
-    });
-
-    return product;
-  }
-
   async create(createProductDto: CreateProductDto) {
     const product = this.productRepository.create(createProductDto);
 
@@ -103,11 +93,17 @@ export class ProductsService {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { limit, offset } = paginationDto;
-    return await this.productRepository.find({
+    const { page } = paginationDto;
+    const limit = paginationDto.limit ?? DefaultPageSize.PRODUCT;
+    const offset = this.paginationService.calculateOffset(limit, page);
+
+    const [data, count] = await this.productRepository.findAndCount({
       skip: offset,
-      take: limit ?? DEFAULT_PAGE_SIZE.USER,
+      take: limit,
     });
+
+    const meta = this.paginationService.createMeta(limit, page, count);
+    return { data, meta };
   }
 
   async update(id: number, udateProductDto: UpdateProductDto) {
