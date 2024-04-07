@@ -17,6 +17,7 @@ import { pathExists } from 'fs-extra';
 import { StorageService } from 'src/files/storage/storage.service';
 import { PaginationService } from 'src/querying/pagination.service';
 import { ProductsQueryDto } from './dto/querying/products.filter.dto';
+import { FilteringService } from '../../querying/filtering.service';
 
 @Injectable()
 export class ProductsService {
@@ -25,6 +26,7 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     private readonly storageService: StorageService,
     private readonly paginationService: PaginationService,
+    private readonly filteringService: FilteringService,
   ) {}
 
   async uploadImages(id: number, files: Express.Multer.File[]) {
@@ -100,8 +102,8 @@ export class ProductsService {
 
     const [data, count] = await this.productRepository.findAndCount({
       where: {
-        name: name ? ILike(`%${name}%`) : undefined,
-        price,
+        name: name ? this.filteringService.contains(name) : undefined,
+        price: this.filteringService.compare(price),
         categories: { id: categoryId },
       },
       order: { [sort]: order },
